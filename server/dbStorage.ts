@@ -163,7 +163,7 @@ export class DatabaseStorage implements IStorage {
         .update(siteSettings)
         .set({ 
           value,
-          updatedAt: new Date().toISOString() 
+          updatedAt: new Date() // Use Date object directly, not string
         })
         .where(eq(siteSettings.key, key))
         .returning();
@@ -176,7 +176,7 @@ export class DatabaseStorage implements IStorage {
         .values({
           key,
           value,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date() // Use Date object directly, not string
         })
         .returning();
       
