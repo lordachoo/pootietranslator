@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertDictionaryEntrySchema } from "@shared/schema";
+import { insertDictionaryEntrySchema, insertSiteSettingSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -192,6 +192,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json({ success: true, message: "Dictionary entry deleted successfully" });
     } catch (error) {
       console.error("Error deleting dictionary entry:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Site Settings routes
+  app.get("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const settings = await storage.getSiteSettings();
+      res.status(200).json(settings);
+    } catch (error) {
+      console.error("Error fetching site settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/settings/:key", async (req: Request, res: Response) => {
+    try {
+      const key = req.params.key;
+      const setting = await storage.getSiteSetting(key);
+      
+      if (!setting) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.status(200).json(setting);
+    } catch (error) {
+      console.error(`Error fetching site setting:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const siteSettingSchema = z.object({
+        key: z.string().min(1, "Key is required"),
+        value: z.string().optional()
+      });
+      
+      const validatedData = siteSettingSchema.safeParse(req.body);
+      
+      if (!validatedData.success) {
+        return res.status(400).json({ 
+          message: "Invalid setting data", 
+          errors: fromZodError(validatedData.error).message 
+        });
+      }
+      
+      const { key, value = "" } = validatedData.data;
+      const setting = await storage.setSiteSetting(key, value);
+      
+      res.status(200).json(setting);
+    } catch (error) {
+      console.error("Error updating site setting:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

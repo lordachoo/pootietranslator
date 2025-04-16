@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, dictionaryEntries } from "@shared/schema";
+import { users, dictionaryEntries, siteSettings } from "@shared/schema";
 import { log } from "./vite";
 
 /**
@@ -81,6 +81,24 @@ export async function seedDatabase() {
           pootieTangPhrase: "Dirty Dee, you're a baddy daddy lamatai tabby chai!",
           englishTranslation: "Dirty Dee, you're a terrible person!",
           usageContext: "A threat or insult directed at the character Dirty Dee"
+        }
+      ]);
+    }
+    
+    // Check if we already have site settings
+    const existingSettings = await db.select().from(siteSettings);
+    if (existingSettings.length === 0) {
+      log("No site settings found, adding default settings");
+      
+      // Add default site settings
+      await db.insert(siteSettings).values([
+        {
+          key: "siteTitle",
+          value: "Pootie Tang Dictionary",
+        },
+        {
+          key: "siteDescription",
+          value: "The ultimate translator for Pootie Tang phrases. Sa da tay!",
         }
       ]);
     }
