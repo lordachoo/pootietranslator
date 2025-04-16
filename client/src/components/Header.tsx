@@ -4,24 +4,37 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
 import LoginModal from "./LoginModal";
-import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 
 const Header = () => {
   const [location, setLocation] = useLocation();
-  const { isAuthenticated, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Fetch site settings for the title
+  const { data: settings } = useQuery({
+    queryKey: ["/api/settings"],
+    queryFn: async () => {
+      const response = await fetch("/api/settings");
+      if (!response.ok) {
+        throw new Error("Failed to fetch site settings");
+      }
+      return response.json();
+    }
+  });
+
+  // Get site title from settings
+  const getSiteTitle = (): string => {
+    if (!settings) return "Pootie Tang Dictionary";
+    const titleSetting = settings.find((s: any) => s.key === "siteTitle");
+    return titleSetting?.value || "Pootie Tang Dictionary";
+  };
 
   const handleTabChange = (value: string) => {
     setLocation(value);
   };
 
   const handleAuthButtonClick = () => {
-    if (isAuthenticated) {
-      logout();
-      setLocation("/");
-    } else {
-      setShowLoginModal(true);
-    }
+    setShowLoginModal(true);
   };
 
   return (
@@ -30,7 +43,7 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Languages className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">Pootie Tang Dictionary</h1>
+            <h1 className="text-2xl font-bold">{getSiteTitle()}</h1>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
@@ -38,7 +51,7 @@ const Header = () => {
               onClick={handleAuthButtonClick}
               className="rounded-full font-medium text-sm"
             >
-              {isAuthenticated ? "Logout" : "Admin Login"}
+              Admin Login
             </Button>
           </div>
         </div>
@@ -59,23 +72,18 @@ const Header = () => {
               >
                 Dictionary
               </TabsTrigger>
-              {isAuthenticated && (
-                <TabsTrigger
-                  value="/admin"
-                  className="py-4 px-6 font-medium border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 rounded-none bg-transparent"
-                >
-                  Admin Panel
-                </TabsTrigger>
-              )}
+              <TabsTrigger
+                value="/admin"
+                className="py-4 px-6 font-medium border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 rounded-none bg-transparent"
+              >
+                Admin Panel
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
       </div>
 
-      <LoginModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)} 
-      />
+      {/* LoginModal temporarily removed to fix auth issues */}
     </>
   );
 };

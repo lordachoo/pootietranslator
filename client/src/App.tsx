@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 
-function Router() {
+function AppContent() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -29,7 +29,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
+        <AppContent />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
