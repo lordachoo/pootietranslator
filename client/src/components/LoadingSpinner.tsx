@@ -43,23 +43,48 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     if (!showPhrase) return;
 
     // Set initial phrase
-    setPhrase(CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)]);
+    const initialPhrase = CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)];
+    setPhrase(initialPhrase);
+    console.log("LoadingSpinner: Initial phrase set to", initialPhrase);
 
     // Set up interval to change phrase
     const interval = setInterval(() => {
-      setPhrase(CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)]);
+      const newPhrase = CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)];
+      setPhrase(newPhrase);
+      console.log("LoadingSpinner: Phrase changed to", newPhrase);
     }, 2000);
 
+    console.log("LoadingSpinner: Started phrase rotation interval");
+
     // Clean up interval on unmount
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      console.log("LoadingSpinner: Cleaned up phrase rotation interval");
+    };
   }, [showPhrase]);
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
-      <Loader2 className={cn("animate-spin text-primary", sizeMap[size])} />
+      {/* Spinner with pulsating effect */}
+      <div className="relative">
+        <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" 
+             style={{ 
+               width: size === "small" ? "16px" : size === "medium" ? "32px" : "48px", 
+               height: size === "small" ? "16px" : size === "medium" ? "32px" : "48px"
+             }}></div>
+        <Loader2 className={cn(
+          "animate-spin text-primary relative z-10", 
+          sizeMap[size]
+        )} />
+      </div>
       
+      {/* Catchphrase with gradient text effect */}
       {showPhrase && (
-        <p className={cn("text-primary mt-2 text-center", phraseClassName)}>
+        <p className={cn(
+          "mt-4 text-center font-medium bg-gradient-to-r from-primary/90 to-primary/60 bg-clip-text text-transparent", 
+          size === "small" ? "text-xs" : size === "medium" ? "text-sm" : "text-base",
+          phraseClassName
+        )}>
           {message || phrase}
         </p>
       )}

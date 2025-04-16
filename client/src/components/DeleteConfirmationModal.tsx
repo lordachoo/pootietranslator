@@ -28,8 +28,16 @@ const DeleteConfirmationModal = ({
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
+      console.log("Deleting dictionary entry...");
+      
       if (!entryId) throw new Error("No entry ID provided");
+      
+      // Add artificial delay to make loading state more visible (for testing)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await apiRequest("DELETE", `/api/dictionary/${entryId}`);
+      
+      console.log("Dictionary entry deleted");
       return response.json();
     },
     onSuccess: () => {

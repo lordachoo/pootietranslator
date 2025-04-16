@@ -47,10 +47,18 @@ const SiteSettingsForm = () => {
   const { data: settings, isLoading: settingsLoading } = useQuery({
     queryKey: ["/api/settings"],
     queryFn: async () => {
+      console.log("Loading site settings...");
+      
+      // Add artificial delay to make loading state more visible (for testing)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await fetch("/api/settings");
       const data = await response.json();
+      
+      console.log("Site settings loaded");
       return data;
     },
+    staleTime: 0, // Don't use cached data
   });
 
   // Set the form values when settings are loaded

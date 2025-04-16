@@ -26,13 +26,21 @@ const AdminEntryTable = () => {
   const { data: entries = [], isLoading } = useQuery<DictionaryEntry[]>({
     queryKey: ["/api/dictionary", searchQuery],
     queryFn: async () => {
+      console.log("Admin: Loading dictionary entries...");
+      
+      // Add artificial delay to make loading state more visible (for testing)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const url = searchQuery 
         ? `/api/dictionary?q=${encodeURIComponent(searchQuery)}`
         : "/api/dictionary";
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch dictionary entries");
+      
+      console.log("Admin: Dictionary entries loaded");
       return response.json();
     },
+    staleTime: 0, // Don't use cached data
   });
 
   const handleSearch = (query: string) => {

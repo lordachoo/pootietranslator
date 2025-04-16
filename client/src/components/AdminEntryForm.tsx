@@ -75,7 +75,13 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
 
   const createEntryMutation = useMutation({
     mutationFn: async (data: FormValues) => {
+      console.log("Creating dictionary entry...");
+      
+      // Add artificial delay to make loading state more visible (for testing)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await apiRequest("POST", "/api/dictionary", data);
+      console.log("Dictionary entry created");
       return response.json();
     },
     onSuccess: () => {
@@ -97,8 +103,16 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
 
   const updateEntryMutation = useMutation({
     mutationFn: async (data: FormValues) => {
+      console.log("Updating dictionary entry...");
+      
       if (!entryToEdit) throw new Error("No entry to edit");
+      
+      // Add artificial delay to make loading state more visible (for testing)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await apiRequest("PUT", `/api/dictionary/${entryToEdit.id}`, data);
+      
+      console.log("Dictionary entry updated");
       return response.json();
     },
     onSuccess: () => {
