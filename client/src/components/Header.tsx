@@ -4,10 +4,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
 import LoginModal from "./LoginModal";
+import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 
 const Header = () => {
   const [location, setLocation] = useLocation();
+  const { isAuthenticated, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Fetch site settings for the title
@@ -34,7 +36,12 @@ const Header = () => {
   };
 
   const handleAuthButtonClick = () => {
-    setShowLoginModal(true);
+    if (isAuthenticated) {
+      logout();
+      setLocation("/");
+    } else {
+      setShowLoginModal(true);
+    }
   };
 
   return (
@@ -51,7 +58,7 @@ const Header = () => {
               onClick={handleAuthButtonClick}
               className="rounded-full font-medium text-sm"
             >
-              Admin Login
+              {isAuthenticated ? "Logout" : "Admin Login"}
             </Button>
           </div>
         </div>
@@ -72,18 +79,23 @@ const Header = () => {
               >
                 Dictionary
               </TabsTrigger>
-              <TabsTrigger
-                value="/admin"
-                className="py-4 px-6 font-medium border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 rounded-none bg-transparent"
-              >
-                Admin Panel
-              </TabsTrigger>
+              {isAuthenticated && (
+                <TabsTrigger
+                  value="/admin"
+                  className="py-4 px-6 font-medium border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 rounded-none bg-transparent"
+                >
+                  Admin Panel
+                </TabsTrigger>
+              )}
             </TabsList>
           </Tabs>
         </div>
       </div>
 
-      {/* LoginModal temporarily removed to fix auth issues */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+      />
     </>
   );
 };
