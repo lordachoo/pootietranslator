@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Info } from "lucide-react";
+import { Info, Volume2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import type { DictionaryEntry } from "@shared/schema";
 
 interface DictionaryCardProps {
@@ -7,6 +9,42 @@ interface DictionaryCardProps {
 }
 
 const DictionaryCard = ({ entry }: DictionaryCardProps) => {
+  const { toast } = useToast();
+  
+  const handlePronunciation = () => {
+    if (entry.audioUrl) {
+      // If custom audio URL is provided, play that
+      const audio = new Audio(entry.audioUrl);
+      audio.play().catch(err => {
+        console.error("Error playing audio:", err);
+        toast({
+          title: "Audio Error",
+          description: "Could not play the audio file",
+          variant: "destructive"
+        });
+        // Fall back to speech synthesis if audio file fails
+        speakPhrase(entry.pootieTangPhrase);
+      });
+    } else {
+      // Otherwise use speech synthesis
+      speakPhrase(entry.pootieTangPhrase);
+    }
+  };
+  
+  const speakPhrase = (phrase: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(phrase);
+      utterance.rate = 0.8; // Slow down a bit for clarity
+      window.speechSynthesis.speak(utterance);
+    } else {
+      toast({
+        title: "Speech Not Supported",
+        description: "Your browser doesn't support text-to-speech",
+        variant: "destructive"
+      });
+    }
+  };
+  
   return (
     <Card className="mb-4 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <CardContent className="p-6">

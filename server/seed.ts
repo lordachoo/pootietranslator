@@ -30,17 +30,23 @@ export async function seedDatabase() {
         {
           pootieTangPhrase: "Sa da tay",
           englishTranslation: "That's right / I understand",
-          usageContext: "Generally positive interpretation, an affirmative response"
+          usageContext: "Generally positive interpretation, an affirmative response",
+          pronunciation: "/sah-dah-tay/",
+          audioUrl: ""
         },
         {
           pootieTangPhrase: "Wa da tah",
           englishTranslation: "That's for sure! / I agree",
-          usageContext: "Confirmation statement, used to express agreement"
+          usageContext: "Confirmation statement, used to express agreement",
+          pronunciation: "/wah-dah-tah/",
+          audioUrl: ""
         },
         {
           pootieTangPhrase: "Cole me on the panny sty",
           englishTranslation: "Call me on the phone",
-          usageContext: "Said during an interview with Bob Costas"
+          usageContext: "Said during an interview with Bob Costas",
+          pronunciation: "/kohl-mee-on-thuh-pan-ee-sty/",
+          audioUrl: ""
         },
         {
           pootieTangPhrase: "Sine your pitty on the runny kine",

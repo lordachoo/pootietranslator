@@ -252,6 +252,7 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                             size="icon"
                             variant="outline"
                             onClick={() => {
+                              if (!field.value) return;
                               const audio = new Audio(field.value);
                               audio.play().catch(err => {
                                 console.error("Error playing audio:", err);
@@ -264,7 +265,7 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                             }}
                             disabled={isPending || !field.value}
                           >
-                            <VolumeUp className="h-4 w-4" />
+                            <Volume2 className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
