@@ -23,6 +23,16 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
+  
+  async updateUserPassword(id: number, newPassword: string): Promise<boolean> {
+    const result = await db
+      .update(users)
+      .set({ password: newPassword })
+      .where(eq(users.id, id))
+      .returning({ id: users.id });
+    
+    return result.length > 0;
+  }
 
   // Dictionary entries methods
   async getDictionaryEntries(): Promise<DictionaryEntry[]> {

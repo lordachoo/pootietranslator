@@ -5,6 +5,13 @@ import { insertDictionaryEntrySchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
+// Schema for password change
+const changePasswordSchema = z.object({
+  userId: z.number(),
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters")
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/login", async (req: Request, res: Response) => {
@@ -31,6 +38,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Login error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Password change endpoint
+  app.post("/api/change-password", async (req: Request, res: Response) => {
+    try {
+      const validatedData = changePasswordSchema.safeParse(req.body);
+      
+      if (!validatedData.success) {
+        return res.status(400).json({ 
+          message: "Invalid password data", 
+          errors: fromZodError(validatedData.error).message 
+        });
+      }
+      
+      const { userId, currentPassword, newPassword } = validatedData.data;
+      
+      // Verify the user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify current password
+      if (user.password !== currentPassword) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+      
+      // Update password
+      const success = await storage.updateUserPassword(userId, newPassword);
+      
+      if (success) {
+        res.status(200).json({ 
+          success: true, 
+          message: "Password updated successfully" 
+        });
+      } else {
+        res.status(500).json({ message: "Failed to update password" });
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
