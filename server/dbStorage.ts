@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, dictionaryEntries } from "@shared/schema";
-import { type User, type InsertUser, type DictionaryEntry, type InsertDictionaryEntry } from "@shared/schema";
+import { users, dictionaryEntries, siteSettings } from "@shared/schema";
+import { type User, type InsertUser, type DictionaryEntry, type InsertDictionaryEntry, type SiteSetting } from "@shared/schema";
 import { eq, like, or } from "drizzle-orm";
 import { IStorage } from "./storage";
 
@@ -137,5 +137,50 @@ export class DatabaseStorage implements IStorage {
       .returning({ id: dictionaryEntries.id });
     
     return result.length > 0;
+  }
+
+  // Site settings methods
+  async getSiteSettings(): Promise<SiteSetting[]> {
+    return await db.select().from(siteSettings);
+  }
+
+  async getSiteSetting(key: string): Promise<SiteSetting | undefined> {
+    const [setting] = await db
+      .select()
+      .from(siteSettings)
+      .where(eq(siteSettings.key, key));
+    
+    return setting || undefined;
+  }
+
+  async setSiteSetting(key: string, value: string): Promise<SiteSetting> {
+    // Check if the setting already exists
+    const existingSetting = await this.getSiteSetting(key);
+    
+    if (existingSetting) {
+      // Update existing setting
+      const [updatedSetting] = await db
+        .update(siteSettings)
+        .set({ 
+          value,
+          updatedAt: new Date().toISOString() 
+        })
+        .where(eq(siteSettings.key, key))
+        .returning();
+      
+      return updatedSetting;
+    } else {
+      // Create new setting
+      const [newSetting] = await db
+        .insert(siteSettings)
+        .values({
+          key,
+          value,
+          updatedAt: new Date().toISOString()
+        })
+        .returning();
+      
+      return newSetting;
+    }
   }
 }

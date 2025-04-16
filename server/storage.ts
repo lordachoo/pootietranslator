@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type DictionaryEntry, type InsertDictionaryEntry } from "@shared/schema";
+import { type User, type InsertUser, type DictionaryEntry, type InsertDictionaryEntry, type SiteSetting } from "@shared/schema";
 import { DatabaseStorage } from "./dbStorage";
 
 // modify the interface with any CRUD methods
@@ -17,6 +17,11 @@ export interface IStorage {
   createDictionaryEntry(entry: InsertDictionaryEntry): Promise<DictionaryEntry>;
   updateDictionaryEntry(id: number, entry: Partial<InsertDictionaryEntry>): Promise<DictionaryEntry | undefined>;
   deleteDictionaryEntry(id: number): Promise<boolean>;
+  
+  // Site settings methods
+  getSiteSettings(): Promise<SiteSetting[]>;
+  getSiteSetting(key: string): Promise<SiteSetting | undefined>;
+  setSiteSetting(key: string, value: string): Promise<SiteSetting>;
 }
 
 // We're now using the DatabaseStorage class instead of MemStorage

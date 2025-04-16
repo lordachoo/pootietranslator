@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -32,3 +32,19 @@ export const insertDictionaryEntrySchema = createInsertSchema(dictionaryEntries)
 
 export type InsertDictionaryEntry = z.infer<typeof insertDictionaryEntrySchema>;
 export type DictionaryEntry = typeof dictionaryEntries.$inferSelect;
+
+// Site Settings table
+export const siteSettings = pgTable("site_settings", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertSiteSettingSchema = createInsertSchema(siteSettings).pick({
+  key: true,
+  value: true,
+});
+
+export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
+export type SiteSetting = typeof siteSettings.$inferSelect;
