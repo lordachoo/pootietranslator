@@ -9,6 +9,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +26,14 @@ const formSchema = z.object({
   siteTitle: z.string().min(1, "Site title is required"),
   siteDescription: z.string().min(1, "Site description is required"),
   gifUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  loadingPhrases: z.string().refine((value) => {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed);
+    } catch {
+      return false;
+    }
+  }, "Must be a valid JSON array of phrases. Example: [\"Sa da tay!\", \"Wa da tah!\"]"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,6 +49,7 @@ const SiteSettingsForm = () => {
       siteTitle: "",
       siteDescription: "",
       gifUrl: "",
+      loadingPhrases: "[]",
     },
   });
 
@@ -67,11 +77,13 @@ const SiteSettingsForm = () => {
       const titleSetting = settings.find((s: any) => s.key === "siteTitle");
       const descriptionSetting = settings.find((s: any) => s.key === "siteDescription");
       const gifUrlSetting = settings.find((s: any) => s.key === "gifUrl");
+      const loadingPhrasesSetting = settings.find((s: any) => s.key === "loadingPhrases");
 
       form.reset({
         siteTitle: titleSetting?.value || "",
         siteDescription: descriptionSetting?.value || "",
         gifUrl: gifUrlSetting?.value || "",
+        loadingPhrases: loadingPhrasesSetting?.value || "[]",
       });
 
       setIsLoading(false);
@@ -120,15 +132,30 @@ const SiteSettingsForm = () => {
     },
   });
 
+  // Update loading phrases mutation
+  const updateLoadingPhrasesMutation = useMutation({
+    mutationFn: async (phrases: string) => {
+      const res = await apiRequest("POST", "/api/settings", {
+        key: "loadingPhrases",
+        value: phrases,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+    },
+  });
+
   // Form submission handler
   const onSubmit = async (data: FormValues) => {
     try {
       setIsLoading(true);
       
-      // Update title, description, and GIF URL
+      // Update title, description, GIF URL, and loading phrases
       await updateTitleMutation.mutateAsync(data.siteTitle);
       await updateDescriptionMutation.mutateAsync(data.siteDescription);
       await updateGifUrlMutation.mutateAsync(data.gifUrl || "");
+      await updateLoadingPhrasesMutation.mutateAsync(data.loadingPhrases);
       
       toast({
         title: "Settings updated",
@@ -227,6 +254,48 @@ const SiteSettingsForm = () => {
                         alt="GIF Preview" 
                         className="max-w-full h-auto rounded-md border max-h-[200px]" 
                       />
+                    </div>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="loadingPhrases"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Loading Spinner Phrases</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={'["Sa da tay!", "Wa da tah!", "Sine your pitty on the runny kine!"]'}
+                      rows={5}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Enter phrases as a JSON array of strings. These will be displayed randomly in the loading spinner.
+                  </FormDescription>
+                  <FormMessage />
+                  {field.value && (
+                    <div className="mt-2">
+                      <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                      <div className="bg-gray-50 rounded-md p-3 text-sm font-mono overflow-auto max-h-[200px]">
+                        {(() => {
+                          try {
+                            const phrases = JSON.parse(field.value);
+                            return (
+                              <ul className="list-disc pl-5">
+                                {Array.isArray(phrases) && phrases.map((phrase, index) => (
+                                  <li key={index} className="mb-1">{phrase}</li>
+                                ))}
+                              </ul>
+                            );
+                          } catch (e) {
+                            return <p className="text-destructive">Invalid JSON format</p>;
+                          }
+                        })()}
+                      </div>
                     </div>
                   )}
                 </FormItem>
