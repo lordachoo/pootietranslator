@@ -22,12 +22,16 @@ export const dictionaryEntries = pgTable("dictionary_entries", {
   pootieTangPhrase: text("pootie_tang_phrase").notNull(),
   englishTranslation: text("english_translation").notNull(),
   usageContext: text("usage_context"),
+  pronunciation: text("pronunciation"),
+  audioUrl: text("audio_url"),
 });
 
 export const insertDictionaryEntrySchema = createInsertSchema(dictionaryEntries).pick({
   pootieTangPhrase: true,
   englishTranslation: true,
   usageContext: true,
+  pronunciation: true,
+  audioUrl: true,
 });
 
 export type InsertDictionaryEntry = z.infer<typeof insertDictionaryEntrySchema>;

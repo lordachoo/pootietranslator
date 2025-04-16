@@ -11,6 +11,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Volume2 } from "lucide-react";
 import { insertDictionaryEntrySchema, type DictionaryEntry } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -54,6 +56,8 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
       pootieTangPhrase: "",
       englishTranslation: "",
       usageContext: "",
+      pronunciation: "",
+      audioUrl: "",
     },
   });
 
@@ -63,12 +67,16 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
         pootieTangPhrase: entryToEdit.pootieTangPhrase,
         englishTranslation: entryToEdit.englishTranslation,
         usageContext: entryToEdit.usageContext || "",
+        pronunciation: entryToEdit.pronunciation || "",
+        audioUrl: entryToEdit.audioUrl || "",
       });
     } else {
       form.reset({
         pootieTangPhrase: "",
         englishTranslation: "",
         usageContext: "",
+        pronunciation: "",
+        audioUrl: "",
       });
     }
   }, [entryToEdit, form, isOpen]);
@@ -196,6 +204,80 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                 </FormItem>
               )}
             />
+            
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-medium mb-2">Pronunciation Guide</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Add pronunciation information to help users correctly say the Pootie Tang phrase.
+              </p>
+              
+              <FormField
+                control={form.control}
+                name="pronunciation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phonetic Pronunciation</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g. /sah-dah-tay/" 
+                        {...field} 
+                        disabled={isPending} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Provide a phonetic spelling to help with pronunciation
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="audioUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Audio URL (Optional)</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input 
+                          placeholder="https://example.com/audio.mp3" 
+                          {...field} 
+                          disabled={isPending} 
+                          className="flex-1"
+                        />
+                        {field.value && (
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            onClick={() => {
+                              const audio = new Audio(field.value);
+                              audio.play().catch(err => {
+                                console.error("Error playing audio:", err);
+                                toast({
+                                  title: "Audio Error",
+                                  description: "Could not play the audio file",
+                                  variant: "destructive"
+                                });
+                              });
+                            }}
+                            disabled={isPending || !field.value}
+                          >
+                            <VolumeUp className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Link to an audio file for pronunciation (mp3, wav, etc)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
             <DialogFooter className="pt-4">
               <Button 
                 type="button" 
