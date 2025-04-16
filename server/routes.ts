@@ -225,6 +225,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/settings", async (req: Request, res: Response) => {
     try {
+      // Log the request body for debugging
+      console.log("Site settings update request:", req.body);
+      
       const siteSettingSchema = z.object({
         key: z.string().min(1, "Key is required"),
         value: z.string().optional()
@@ -233,6 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = siteSettingSchema.safeParse(req.body);
       
       if (!validatedData.success) {
+        console.log("Validation error:", validatedData.error);
         return res.status(400).json({ 
           message: "Invalid setting data", 
           errors: fromZodError(validatedData.error).message 
@@ -240,9 +244,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { key, value = "" } = validatedData.data;
-      const setting = await storage.setSiteSetting(key, value);
+      console.log(`Updating setting: ${key} = ${value}`);
       
-      res.status(200).json(setting);
+      try {
+        const setting = await storage.setSiteSetting(key, value);
+        console.log("Setting updated successfully:", setting);
+        res.status(200).json(setting);
+      } catch (dbError) {
+        console.error("Database error during setting update:", dbError);
+        res.status(500).json({ message: "Database error", error: dbError.message });
+      }
     } catch (error) {
       console.error("Error updating site setting:", error);
       res.status(500).json({ message: "Internal server error" });
