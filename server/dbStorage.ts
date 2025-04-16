@@ -42,21 +42,51 @@ export class DatabaseStorage implements IStorage {
       return this.getDictionaryEntries();
     }
     
-    // Convert query to lowercase for case-insensitive search
-    const trimmedQuery = query.trim();
-    const likeQuery = `%${trimmedQuery}%`;
+    // Normalize the query to handle case insensitivity
+    const normalizedQuery = query.trim().toLowerCase();
     
-    // Use ilike for case-insensitive search
-    return await db
-      .select()
-      .from(dictionaryEntries)
-      .where(
-        or(
-          like(dictionaryEntries.pootieTangPhrase, likeQuery, { ilike: true }),
-          like(dictionaryEntries.englishTranslation, likeQuery, { ilike: true }),
-          like(dictionaryEntries.usageContext || '', likeQuery, { ilike: true })
-        )
+    // Get all entries 
+    const allEntries = await this.getDictionaryEntries();
+    
+    // First, try to find exact matches (entries containing the full query as a substring)
+    const exactMatches = allEntries.filter(entry => {
+      const pootieTangPhrase = entry.pootieTangPhrase.toLowerCase();
+      const englishTranslation = entry.englishTranslation.toLowerCase();
+      const usageContext = (entry.usageContext || '').toLowerCase();
+      
+      return (
+        pootieTangPhrase.includes(normalizedQuery) || 
+        englishTranslation.includes(normalizedQuery) || 
+        usageContext.includes(normalizedQuery)
       );
+    });
+    
+    // If we found exact matches, return them
+    if (exactMatches.length > 0) {
+      return exactMatches;
+    }
+    
+    // Otherwise, split the query into words and look for partial matches
+    const queryTerms = normalizedQuery.split(/\s+/).filter(term => term.length > 1);
+    
+    // If no valid terms after filtering, return all entries
+    if (queryTerms.length === 0) {
+      return allEntries;
+    }
+    
+    // Filter entries where ALL terms match at least one field
+    return allEntries.filter(entry => {
+      const pootieTangPhrase = entry.pootieTangPhrase.toLowerCase();
+      const englishTranslation = entry.englishTranslation.toLowerCase();
+      const usageContext = (entry.usageContext || '').toLowerCase();
+      
+      // Check if each term is included in at least one of the fields
+      return queryTerms.every(term => 
+        pootieTangPhrase.includes(term) || 
+        englishTranslation.includes(term) || 
+        usageContext.includes(term)
+      );
+    });
   }
 
   async createDictionaryEntry(entry: InsertDictionaryEntry): Promise<DictionaryEntry> {
