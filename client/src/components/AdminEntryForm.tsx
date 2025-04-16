@@ -196,6 +196,7 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                     <Textarea 
                       placeholder="Enter usage context or examples..." 
                       {...field} 
+                      value={field.value || ''}
                       rows={3}
                       disabled={isPending}
                     />
@@ -221,6 +222,7 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                       <Input 
                         placeholder="e.g. /sah-dah-tay/" 
                         {...field} 
+                        value={field.value || ''}
                         disabled={isPending} 
                       />
                     </FormControl>
@@ -243,6 +245,7 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                         <Input 
                           placeholder="https://example.com/audio.mp3" 
                           {...field} 
+                          value={field.value || ''}
                           disabled={isPending} 
                           className="flex-1"
                         />

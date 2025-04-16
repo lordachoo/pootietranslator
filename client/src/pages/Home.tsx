@@ -54,8 +54,7 @@ const Home = () => {
           <div className="text-center py-12">
             <LoadingSpinner 
               size="large" 
-              showPhrase={true} 
-              message={searchQuery ? `Searching for "${searchQuery}"...` : undefined}
+              showPhrase={true}
             />
           </div>
         ) : entries.length > 0 ? (

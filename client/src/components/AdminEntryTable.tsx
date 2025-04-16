@@ -83,7 +83,7 @@ const AdminEntryTable = () => {
             <div className="p-12 text-center">
               <LoadingSpinner 
                 size="medium" 
-                message={searchQuery ? `Searching for "${searchQuery}"...` : undefined}
+                showPhrase={true}
               />
             </div>
           ) : (
