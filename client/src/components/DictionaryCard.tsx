@@ -12,7 +12,7 @@ const DictionaryCard = ({ entry }: DictionaryCardProps) => {
   const { toast } = useToast();
   
   const handlePronunciation = () => {
-    if (entry.audioUrl) {
+    if (entry.audioUrl && entry.audioUrl.trim() !== "") {
       // If custom audio URL is provided, play that
       const audio = new Audio(entry.audioUrl);
       audio.play().catch(err => {
@@ -63,8 +63,38 @@ const DictionaryCard = ({ entry }: DictionaryCardProps) => {
         
         <div className="mt-4 pt-4 border-t border-gray-100">
           <p className="text-gray-900">"{entry.englishTranslation}"</p>
+          
+          <div className="mt-4 flex flex-wrap gap-3">
+            {entry.pronunciation && (
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full">
+                <span className="text-sm font-medium">{entry.pronunciation}</span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6 p-0 hover:text-primary hover:bg-primary/20"
+                  onClick={handlePronunciation}
+                  title="Hear pronunciation"
+                >
+                  <Volume2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
+            {!entry.pronunciation && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={handlePronunciation}
+              >
+                <Volume2 className="h-3.5 w-3.5 mr-1" />
+                Pronounce it
+              </Button>
+            )}
+          </div>
+          
           {entry.usageContext && (
-            <div className="mt-2 flex items-center text-sm text-gray-500">
+            <div className="mt-3 flex items-center text-sm text-gray-500">
               <Info className="h-4 w-4 mr-1" />
               <span>{entry.usageContext}</span>
             </div>

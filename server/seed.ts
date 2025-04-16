@@ -51,7 +51,9 @@ export async function seedDatabase() {
         {
           pootieTangPhrase: "Sine your pitty on the runny kine",
           englishTranslation: "Sign your name on the dotted line",
-          usageContext: "Used when asking someone to sign a document"
+          usageContext: "Used when asking someone to sign a document",
+          pronunciation: "/syne-yore-pit-ee-on-thuh-ruh-nee-kyne/",
+          audioUrl: ""
         },
         {
           pootieTangPhrase: "Capatown",
