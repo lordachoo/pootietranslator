@@ -14,6 +14,7 @@ import type { DictionaryEntry } from "@shared/schema";
 import AdminEntryForm from "./AdminEntryForm";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import SearchBar from "./SearchBar";
+import LoadingSpinner from "./LoadingSpinner";
 
 const AdminEntryTable = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +72,12 @@ const AdminEntryTable = () => {
         
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center">Loading entries...</div>
+            <div className="p-12 text-center">
+              <LoadingSpinner 
+                size="medium" 
+                message={searchQuery ? `Searching for "${searchQuery}"...` : undefined}
+              />
+            </div>
           ) : (
             <>
               <div className="overflow-x-auto">

@@ -23,6 +23,7 @@ import { insertDictionaryEntrySchema, type DictionaryEntry } from "@shared/schem
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { z } from "zod";
 
 // Extend schema with custom validations
@@ -194,7 +195,14 @@ const AdminEntryForm = ({ isOpen, onClose, entryToEdit }: AdminEntryFormProps) =
                 type="submit"
                 disabled={isPending}
               >
-                {isPending ? "Saving..." : "Save Entry"}
+                {isPending ? (
+                  <div className="flex items-center">
+                    <LoadingSpinner size="small" showPhrase={false} className="mr-2" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  "Save Entry"
+                )}
               </Button>
             </DialogFooter>
           </form>

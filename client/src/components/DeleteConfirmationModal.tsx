@@ -11,6 +11,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -69,7 +70,14 @@ const DeleteConfirmationModal = ({
             disabled={deleteMutation.isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            {deleteMutation.isPending ? (
+              <div className="flex items-center">
+                <LoadingSpinner size="small" showPhrase={false} className="mr-2" />
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              "Delete"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
