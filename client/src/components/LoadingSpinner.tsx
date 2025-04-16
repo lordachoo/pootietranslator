@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
-// Array of Pootie Tang catchphrases
-const CATCHPHRASES = [
+// Fallback catchphrases (used if settings can't be loaded)
+const FALLBACK_CATCHPHRASES = [
   "Sa da tay!",
   "Wa da tah!",
   "Sine your pitty on the runny kine!",
@@ -30,6 +31,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   message,
 }) => {
   const [phrase, setPhrase] = useState<string>("");
+  const [phrases, setPhrases] = useState<string[]>(FALLBACK_CATCHPHRASES);
 
   // Map size to dimensions
   const sizeMap = {
@@ -38,18 +40,53 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     large: "h-12 w-12",
   };
 
+  // Fetch loading phrases from site settings
+  const { data: settings } = useQuery({
+    queryKey: ["/api/settings"],
+    queryFn: async () => {
+      try {
+        const response = await fetch("/api/settings");
+        return await response.json();
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+        return null;
+      }
+    },
+    // Don't refetch settings too often for the spinner
+    staleTime: 60000, // 1 minute
+    retryDelay: 5000, // Wait 5s before retry
+  });
+
+  // Parse phrases from settings when they load
+  useEffect(() => {
+    if (settings) {
+      try {
+        const phraseSetting = settings.find((s: any) => s.key === "loadingPhrases");
+        if (phraseSetting?.value) {
+          const loadedPhrases = JSON.parse(phraseSetting.value);
+          if (Array.isArray(loadedPhrases) && loadedPhrases.length > 0) {
+            setPhrases(loadedPhrases);
+            console.log("LoadingSpinner: Loaded phrases from settings:", loadedPhrases);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing loading phrases:", error);
+      }
+    }
+  }, [settings]);
+
   // Change the phrase every 2 seconds
   useEffect(() => {
     if (!showPhrase) return;
 
     // Set initial phrase
-    const initialPhrase = CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)];
+    const initialPhrase = phrases[Math.floor(Math.random() * phrases.length)];
     setPhrase(initialPhrase);
     console.log("LoadingSpinner: Initial phrase set to", initialPhrase);
 
     // Set up interval to change phrase
     const interval = setInterval(() => {
-      const newPhrase = CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)];
+      const newPhrase = phrases[Math.floor(Math.random() * phrases.length)];
       setPhrase(newPhrase);
       console.log("LoadingSpinner: Phrase changed to", newPhrase);
     }, 2000);
@@ -61,7 +98,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       clearInterval(interval);
       console.log("LoadingSpinner: Cleaned up phrase rotation interval");
     };
-  }, [showPhrase]);
+  }, [showPhrase, phrases]);
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>

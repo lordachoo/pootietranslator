@@ -99,6 +99,22 @@ export async function seedDatabase() {
         {
           key: "siteDescription",
           value: "The ultimate translator for Pootie Tang phrases. Sa da tay!",
+        },
+        {
+          key: "gifUrl",
+          value: "",
+        },
+        {
+          key: "loadingPhrases", 
+          value: JSON.stringify([
+            "Sa da tay!",
+            "Wa da tah!",
+            "Cole me down on the panny sty!",
+            "Sine your pitty on the runny kine!",
+            "Capatown!",
+            "Wadatah!",
+            "Sepatown!"
+          ]),
         }
       ]);
     }
