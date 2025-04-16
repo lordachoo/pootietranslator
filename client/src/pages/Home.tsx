@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/SearchBar";
 import DictionaryCard from "@/components/DictionaryCard";
 import SiteInfo from "@/components/SiteInfo";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import type { DictionaryEntry } from "@shared/schema";
 
 const Home = () => {
@@ -41,7 +42,13 @@ const Home = () => {
         </div>
 
         {isLoading ? (
-          <div className="text-center py-8">Loading dictionary entries...</div>
+          <div className="text-center py-12">
+            <LoadingSpinner 
+              size="large" 
+              showPhrase={true} 
+              message={searchQuery ? `Searching for "${searchQuery}"...` : undefined}
+            />
+          </div>
         ) : entries.length > 0 ? (
           entries.map((entry) => (
             <DictionaryCard key={entry.id} entry={entry} />

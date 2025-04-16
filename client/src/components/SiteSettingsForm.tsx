@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Form validation schema
 const formSchema = z.object({
@@ -138,6 +138,23 @@ const SiteSettingsForm = () => {
     }
   };
 
+  // Show loading spinner when initially fetching settings
+  if (settingsLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Site Settings</CardTitle>
+          <CardDescription>
+            Customize the website title, description text, and add a GIF
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <LoadingSpinner size="large" message="Loading settings..." />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -210,10 +227,10 @@ const SiteSettingsForm = () => {
 
             <Button type="submit" disabled={isLoading || settingsLoading}>
               {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
+                <div className="flex items-center">
+                  <LoadingSpinner size="small" showPhrase={false} className="mr-2" />
+                  <span>Saving...</span>
+                </div>
               ) : (
                 "Save Settings"
               )}
