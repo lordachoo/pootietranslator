@@ -12,6 +12,11 @@ const DictionaryCard = ({ entry }: DictionaryCardProps) => {
   const { toast } = useToast();
   
   const handlePronunciation = () => {
+    // Determine what text to speak - use pronunciation field if available, otherwise use the phrase
+    const textToSpeak = entry.pronunciation && entry.pronunciation.trim() !== "" 
+      ? entry.pronunciation.replace(/[\/\-_]/g, '') // Clean up pronunciation guides like /slashes/ and -dashes-
+      : entry.pootieTangPhrase;
+      
     if (entry.audioUrl && entry.audioUrl.trim() !== "") {
       // If custom audio URL is provided, play that
       const audio = new Audio(entry.audioUrl);
@@ -23,11 +28,11 @@ const DictionaryCard = ({ entry }: DictionaryCardProps) => {
           variant: "destructive"
         });
         // Fall back to speech synthesis if audio file fails
-        speakPhrase(entry.pootieTangPhrase);
+        speakPhrase(textToSpeak);
       });
     } else {
       // Otherwise use speech synthesis
-      speakPhrase(entry.pootieTangPhrase);
+      speakPhrase(textToSpeak);
     }
   };
   
@@ -64,34 +69,36 @@ const DictionaryCard = ({ entry }: DictionaryCardProps) => {
         <div className="mt-4 pt-4 border-t border-gray-100">
           <p className="text-gray-900">"{entry.englishTranslation}"</p>
           
-          <div className="mt-4 flex flex-wrap gap-3">
-            {entry.pronunciation && (
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full">
-                <span className="text-sm font-medium">{entry.pronunciation}</span>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6 p-0 hover:text-primary hover:bg-primary/20"
+          {(entry.pronunciation || (entry.audioUrl && entry.audioUrl.trim() !== "")) && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {entry.pronunciation && (
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full">
+                  <span className="text-sm font-medium">{entry.pronunciation}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 p-0 hover:text-primary hover:bg-primary/20"
+                    onClick={handlePronunciation}
+                    title="Hear pronunciation"
+                  >
+                    <Volume2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              
+              {!entry.pronunciation && entry.audioUrl && entry.audioUrl.trim() !== "" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
                   onClick={handlePronunciation}
-                  title="Hear pronunciation"
                 >
-                  <Volume2 className="h-4 w-4" />
+                  <Volume2 className="h-3.5 w-3.5 mr-1" />
+                  Play Audio
                 </Button>
-              </div>
-            )}
-            
-            {!entry.pronunciation && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 text-xs"
-                onClick={handlePronunciation}
-              >
-                <Volume2 className="h-3.5 w-3.5 mr-1" />
-                Pronounce it
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           
           {entry.usageContext && (
             <div className="mt-3 flex items-center text-sm text-gray-500">
