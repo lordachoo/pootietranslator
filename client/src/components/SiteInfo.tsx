@@ -44,6 +44,9 @@ const SiteInfo = ({ className = "" }: SiteInfoProps) => {
     );
   }
 
+  // Get GIF URL from settings
+  const gifUrl = getSetting("gifUrl");
+
   return (
     <div className={className}>
       <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
@@ -52,6 +55,16 @@ const SiteInfo = ({ className = "" }: SiteInfoProps) => {
       <p className="text-muted-foreground mt-2">
         {description || "Translate between Pootie Tang and English"}
       </p>
+      
+      {gifUrl && (
+        <div className="mt-6 flex justify-center">
+          <img 
+            src={gifUrl} 
+            alt="Pootie Tang GIF" 
+            className="max-w-full h-auto rounded-lg shadow-md max-h-[300px]" 
+          />
+        </div>
+      )}
     </div>
   );
 };

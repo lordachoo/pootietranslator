@@ -24,6 +24,7 @@ import { Loader2 } from "lucide-react";
 const formSchema = z.object({
   siteTitle: z.string().min(1, "Site title is required"),
   siteDescription: z.string().min(1, "Site description is required"),
+  gifUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,6 +39,7 @@ const SiteSettingsForm = () => {
     defaultValues: {
       siteTitle: "",
       siteDescription: "",
+      gifUrl: "",
     },
   });
 
@@ -56,10 +58,12 @@ const SiteSettingsForm = () => {
     if (settings && !settingsLoading) {
       const titleSetting = settings.find((s: any) => s.key === "siteTitle");
       const descriptionSetting = settings.find((s: any) => s.key === "siteDescription");
+      const gifUrlSetting = settings.find((s: any) => s.key === "gifUrl");
 
       form.reset({
         siteTitle: titleSetting?.value || "",
         siteDescription: descriptionSetting?.value || "",
+        gifUrl: gifUrlSetting?.value || "",
       });
 
       setIsLoading(false);
@@ -94,14 +98,29 @@ const SiteSettingsForm = () => {
     },
   });
 
+  // Update GIF URL mutation
+  const updateGifUrlMutation = useMutation({
+    mutationFn: async (gifUrl: string) => {
+      const res = await apiRequest("POST", "/api/settings", {
+        key: "gifUrl",
+        value: gifUrl,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+    },
+  });
+
   // Form submission handler
   const onSubmit = async (data: FormValues) => {
     try {
       setIsLoading(true);
       
-      // Update title and description
+      // Update title, description, and GIF URL
       await updateTitleMutation.mutateAsync(data.siteTitle);
       await updateDescriptionMutation.mutateAsync(data.siteDescription);
+      await updateGifUrlMutation.mutateAsync(data.gifUrl || "");
       
       toast({
         title: "Settings updated",
@@ -124,7 +143,7 @@ const SiteSettingsForm = () => {
       <CardHeader>
         <CardTitle>Site Settings</CardTitle>
         <CardDescription>
-          Customize the website title and description text
+          Customize the website title, description text, and add a GIF
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -158,6 +177,33 @@ const SiteSettingsForm = () => {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="gifUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>GIF URL</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter GIF URL (optional)" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  {field.value && (
+                    <div className="mt-2">
+                      <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                      <img 
+                        src={field.value} 
+                        alt="GIF Preview" 
+                        className="max-w-full h-auto rounded-md border max-h-[200px]" 
+                      />
+                    </div>
+                  )}
                 </FormItem>
               )}
             />
