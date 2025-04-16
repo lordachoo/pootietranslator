@@ -35,23 +35,71 @@ export class MemStorage implements IStorage {
       password: "admin123", // In a real app, this would be hashed
     });
 
-    // Add some initial dictionary entries
+    // Add initial dictionary entries from Pootie Tang Wikiquote
     this.createDictionaryEntry({
       pootieTangPhrase: "Sa da tay",
       englishTranslation: "That's right / I understand",
-      usageContext: "Common affirmative response"
+      usageContext: "Generally positive interpretation, an affirmative response"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Wa da tah",
+      englishTranslation: "That's for sure! / I agree",
+      usageContext: "Confirmation statement, used to express agreement"
     });
 
     this.createDictionaryEntry({
       pootieTangPhrase: "Cole me on the panny sty",
-      englishTranslation: "Roll with me to the next spot",
-      usageContext: "Used when you want someone to accompany you somewhere"
+      englishTranslation: "Call me on the phone",
+      usageContext: "Said during an interview with Bob Costas"
     });
 
     this.createDictionaryEntry({
       pootieTangPhrase: "Sine your pitty on the runny kine",
       englishTranslation: "Sign your name on the dotted line",
       usageContext: "Used when asking someone to sign a document"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Capatown",
+      englishTranslation: "Calm down now",
+      usageContext: "Used in a friendly manner to tell someone to relax"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Ranacan",
+      englishTranslation: "To party",
+      usageContext: "Used when talking about socializing or celebrating"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Bata shane, my dillie?",
+      englishTranslation: "What time is the party?",
+      usageContext: "Said to 'Biggie Shorty' regarding a party"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Tipi tais",
+      englishTranslation: "Kids / children",
+      usageContext: "Generally accepted as referring to young people"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Cama cama leepa chai",
+      englishTranslation: "No, I refuse",
+      usageContext: "Refusal on moral grounds"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "You ain't come one, but many tine tanies!",
+      englishTranslation: "You came to fight me with many friends!",
+      usageContext: "Said to Dirty Dee when he came to challenge Pootie Tang"
+    });
+
+    this.createDictionaryEntry({
+      pootieTangPhrase: "Dirty Dee, you're a baddy daddy lamatai tabby chai!",
+      englishTranslation: "Dirty Dee, you're a terrible person!",
+      usageContext: "A threat or insult directed at the character Dirty Dee"
     });
   }
 
