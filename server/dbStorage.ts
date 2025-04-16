@@ -42,16 +42,19 @@ export class DatabaseStorage implements IStorage {
       return this.getDictionaryEntries();
     }
     
-    const likeQuery = `%${query}%`;
+    // Convert query to lowercase for case-insensitive search
+    const trimmedQuery = query.trim();
+    const likeQuery = `%${trimmedQuery}%`;
     
+    // Use ilike for case-insensitive search
     return await db
       .select()
       .from(dictionaryEntries)
       .where(
         or(
-          like(dictionaryEntries.pootieTangPhrase, likeQuery),
-          like(dictionaryEntries.englishTranslation, likeQuery),
-          like(dictionaryEntries.usageContext || '', likeQuery)
+          like(dictionaryEntries.pootieTangPhrase, likeQuery, { ilike: true }),
+          like(dictionaryEntries.englishTranslation, likeQuery, { ilike: true }),
+          like(dictionaryEntries.usageContext || '', likeQuery, { ilike: true })
         )
       );
   }
