@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/SearchBar";
 import DictionaryCard from "@/components/DictionaryCard";
+import SiteInfo from "@/components/SiteInfo";
 import type { DictionaryEntry } from "@shared/schema";
 
 const Home = () => {
@@ -25,6 +26,9 @@ const Home = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-8 text-center">
+        <SiteInfo className="mb-8" />
+      </div>
       <SearchBar onSearch={handleSearch} />
 
       <div className="max-w-5xl mx-auto">
